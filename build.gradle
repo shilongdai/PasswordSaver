@@ -1,0 +1,68 @@
+buildscript {
+    dependencies {
+        classpath group: 'de.dynamicfiles.projects.gradle.plugins', 
+		name: 'javafx-gradle-plugin', version: "8.8.2"
+    }
+    repositories {
+        mavenLocal()
+        mavenCentral()
+        maven { url "https://oss.sonatype.org/content/repositories/snapshots" }
+    }
+}
+apply plugin: 'java'
+apply plugin: 'application'
+apply plugin: "eclipse"
+mainClassName = 'net.viperfish.passwordvault.Bootstrap'
+sourceCompatibility = 1.7
+targetCompatibility = 1.7
+
+repositories {
+    mavenLocal()
+    mavenCentral()
+    jcenter()
+    maven { url "http://clojars.org/repo" }
+    maven { url "http://repo.maven.apache.org/maven2" }
+}
+
+dependencies {
+    compile group: 'org.bouncycastle', name: 'bcprov-jdk15on', version:'1.53'
+    compile group: 'commons-codec', name: 'commons-codec', version:'1.10'
+    compile group: 'com.j256.ormlite', name: 'ormlite-core', version:'5.0'
+    compile group: 'com.h2database', name: 'h2', version:'1.4.195'
+    compile group: 'com.j256.ormlite', name: 'ormlite-jdbc', version:'5.0'
+    testCompile group: 'junit', name: 'junit', version:'4.12'
+}
+
+apply plugin: 'javafx-gradle-plugin'
+
+
+jfx {
+    mainClass = 'net.viperfish.passwordvault.Bootstrap'
+    vendor = 'Shilong Dai'
+    appName = 'Password Vault'
+    nativeReleaseVersion = "1.0.0"
+}
+import org.gradle.plugins.ide.eclipse.model.AccessRule
+
+eclipse {
+	project.natures 'org.eclipse.buildship.core.gradleprojectnature'
+	classpath {
+        downloadJavadoc = true
+        downloadSources = true
+    }
+}
+
+eclipse.classpath {
+    file.whenMerged {
+        entries.each { source -> 
+            if (source.kind == 'con' && source.path.startsWith('org.eclipse.jdt.launching.JRE_CONTAINER')) {
+                source.accessRules.add(new AccessRule('0', 'sun/applet/AppletAudioClip'))
+                source.accessRules.add(new AccessRule('0', 'javax/swing/**'))
+                source.accessRules.add(new AccessRule('0', 'com/sun/java/swing/**'))
+                source.accessRules.add(new AccessRule('0', 'javafx/**'))
+                source.accessRules.add(new AccessRule('0', 'sun/net/www/protocol/**'))
+            }
+        }
+    }
+}
+
